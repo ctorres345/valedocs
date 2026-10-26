@@ -1,0 +1,9 @@
+{
+  "name": "valedocs",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+  },
+  // Cloudflare creates the DNS record and certificate for this domain (cjtech.dev is in the same account)
+  "routes": [{ "pattern": "valedocs.cjtech.dev", "custom_domain": true }],
+}

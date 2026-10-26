@@ -1,0 +1,36 @@
+{
+  "name": "valedocs",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Registro de notas: a small, offline web app for teachers to enter conduct grades, monthly attendance and norms reports and export them as Excel, PDF or Word.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ctorres345/valedocs"
+  },
+  "homepage": "https://valedocs.cjtech.dev",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "format": "prettier --write .",
+    "layers": "node scripts/check-layers.mjs",
+    "check": "tsc --noEmit && vitest run && prettier --check . && node scripts/check-layers.mjs",
+    "logos": "node scripts/embed-logos.mjs"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "fflate": "^0.8.3",
+    "idb-keyval": "^6.3.0",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.8"
+  },
+  "devDependencies": {
+    "prettier": "^3.9.9",
+    "typescript": "^5.9.3",
+    "vite": "^4.5.14",
+    "vitest": "^0.34.6"
+  }
+}

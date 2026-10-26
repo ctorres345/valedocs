@@ -1,0 +1,10 @@
+node_modules
+dist
+.env.local
+.claude/settings.local.json
+
+# Local Claude Code skills
+.claude/skills/
+
+# School logos of a self-hosted build (see assets/logos/README.md)
+assets/logos/*.png

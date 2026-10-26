@@ -1,0 +1,20 @@
+Valedocs
+Copyright 2026 Cesar Torres (ctorres345)
+
+This product includes no student data, teacher files or school logos. The school
+name, report texts and logos a user enters stay in that user's browser, in the
+backup files and in the school pack files they download.
+
+Valedocs bundles two font files, unmodified, in src/ui/fonts/: Atkinson
+Hyperlegible (Regular and Bold), Copyright 2020 Braille Institute of America,
+Inc., licensed under the SIL Open Font License, Version 1.1
+(https://openfontlicense.org). The full licence text is next to the fonts, in
+OFL.txt, and goes with them in every build.
+
+The exports use these libraries, installed from npm as dependencies and bundled
+into the built site: ExcelJS (MIT), jsPDF and jsPDF-AutoTable (MIT), fflate
+(MIT) and idb-keyval (Apache-2.0). jsPDF in turn bundles DOMPurify (MPL-2.0 or
+Apache-2.0) and html2canvas (MIT). Each library's own licence is in its package
+under node_modules/.
+
+Valedocs is not affiliated with any school, ministry of education or Google.

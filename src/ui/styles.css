@@ -1033,6 +1033,99 @@ textarea.field {
   vertical-align: middle;
   font-weight: 700;
 }
+
+/* Quarter norms report: entry (one card per criterion) and preview of one strip */
+.quarter-months {
+  margin: 0.5rem 0 1rem;
+}
+.quarter-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.4rem;
+  padding: 0.8rem 0.9rem;
+}
+.quarter-row .grade-row-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  flex-wrap: wrap;
+}
+.quarter-row .grade-buttons .btn-grade {
+  flex: 1;
+  max-width: 6rem;
+  min-height: 52px;
+  font-size: 1.15rem;
+}
+.quarter-counts {
+  margin: 0;
+}
+.quarter-badge {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: 6px;
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+.quarter-badge.by-hand {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+.quarter-note-label {
+  font-size: 0.9rem;
+  margin-top: 0.2rem;
+}
+.quarter-student {
+  display: grid;
+  gap: 10px;
+}
+.quarter-school {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+}
+.quarter-school img {
+  height: 40px;
+}
+.quarter-sheet .sheet-table {
+  margin-top: 8px;
+}
+.quarter-sheet .sheet-table th {
+  background: #000;
+  color: #fff;
+  text-align: left;
+}
+.quarter-sheet .sheet-table td {
+  text-align: left;
+  height: 1.9rem;
+}
+.quarter-info {
+  table-layout: fixed;
+}
+.quarter-info th:first-child {
+  width: 26%;
+}
+.quarter-info th:nth-child(3) {
+  width: 14%;
+}
+.quarter-sheet .sheet-table td.c {
+  text-align: center;
+}
+.quarter-levels {
+  white-space: nowrap;
+}
+.quarter-levels span {
+  display: inline-block;
+  min-width: 2.2rem;
+  padding: 0 4px;
+  text-align: center;
+}
+.quarter-levels span.circled {
+  border: 1.5px solid #000;
+  border-radius: 50%;
+  font-weight: 700;
+}
 .student-picker {
   display: flex;
   flex-wrap: wrap;

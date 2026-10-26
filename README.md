@@ -46,6 +46,9 @@ reportes a mano: botones grandes, una guía de 3 pasos por reporte, todo en espa
 - 📝 **Reporte mensual de normas**: tres criterios calificados cada día; cada alumno recibe un documento en Word
   o PDF con un párrafo por nota (los párrafos se editan en los ajustes, con una redacción para él y otra para
   ella).
+- 🗂️ **Reporte trimestral de normas**: una tira por alumno (tres por hoja A4) con el nivel de logro de cada
+  criterio. La nota viene sugerida con el promedio de las notas mensuales de normas; la puedes cambiar y escribir
+  observaciones. También se imprime en blanco.
 - 🖨️ **Hojas en blanco** para imprimir y anotar a mano durante el trimestre o el mes.
 - 🔒 **Todo queda en tu navegador.** No hay cuentas ni servidor: los nombres y las notas se guardan en tu
   celular o computadora y en los archivos que descargas. Hay copia de seguridad y un "paquete del colegio" para
@@ -158,6 +161,9 @@ for schools in Peru); the code, comments and docs are English.
   **consolidated absences and tardies** report over several months.
 - 📝 **Monthly norms report**: three criteria graded every school day; each student gets a Word or PDF document
   that prints a paragraph for each grade (editable in the settings, with one wording for him and one for her).
+- 🗂️ **Quarter norms report**: one strip per student (three per A4 page) with the achievement level of each
+  criterion, suggested from the average of the monthly norms grades; she can change it and add observations. It
+  also prints blank.
 - 🖨️ **Blank sheets** to print and fill in by hand during the term or month.
 - 🔒 **Everything stays in your browser.** No accounts, no server: names and grades are kept on your phone or
   computer and in the files you download. There is a backup file and a "school pack" to carry the school's

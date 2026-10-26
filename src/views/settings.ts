@@ -179,6 +179,55 @@ function normsSection(settings: Settings, rerender: () => void): HTMLElement {
   );
 }
 
+/** The quarter norms report: the auxiliary's name, the title and the name of each row. */
+function quarterSection(settings: Settings): HTMLElement {
+  const text = (id: string, value: string, save: (v: string) => void, fallback?: () => string): HTMLInputElement => {
+    const input = h('input', { type: 'text', class: 'field', id, value });
+    input.addEventListener('input', () => change(() => save(input.value), false));
+    // An empty title or row name is not saved: the default comes back when she leaves the field
+    if (fallback)
+      input.addEventListener('change', () => {
+        if (input.value.trim() !== '') return;
+        input.value = fallback();
+        change(() => save(input.value), false);
+      });
+    return input;
+  };
+  const defaults = defaultSettings();
+  return h(
+    'section',
+    { class: 'quarter-settings' },
+    h('h2', {}, T.quarterSettingsTitle),
+    h('p', { class: 'muted' }, T.quarterSettingsHelp),
+    h(
+      'div',
+      { class: 'form' },
+      h('label', { for: 'set-auxiliary' }, T.auxiliaryLabel),
+      (() => {
+        const input = text('set-auxiliary', settings.auxiliary, (v) => (getData().settings.auxiliary = v));
+        input.placeholder = T.auxiliaryPlaceholder;
+        return input;
+      })(),
+      h('label', { for: 'set-quarter-title' }, T.normsTitleLabel),
+      text(
+        'set-quarter-title',
+        settings.quarterTitle,
+        (v) => (getData().settings.quarterTitle = v),
+        () => defaults.quarterTitle,
+      ),
+      settings.quarterCriteria.flatMap((q, i) => [
+        h('label', { for: `set-quarter-row-${i}` }, T.quarterRowLabel(i + 1)),
+        text(
+          `set-quarter-row-${i}`,
+          q.name,
+          (v) => (getData().settings.quarterCriteria[i].name = v),
+          () => defaults.quarterCriteria[i].name,
+        ),
+      ]),
+    ),
+  );
+}
+
 export function settingsView(): View {
   const root = h('div', { class: 'screen' });
 
@@ -308,6 +357,7 @@ export function settingsView(): View {
         ),
       ),
       normsSection(settings, render),
+      quarterSection(settings),
       h('h2', {}, T.allowedGrades),
       h('p', { class: 'muted' }, T.allowedGradesHelp),
       h('div', { class: 'form' }, allowed),
@@ -329,6 +379,10 @@ export function settingsView(): View {
                   uniformNote: d.settings.uniformNote,
                   normsTitle: d.settings.normsTitle,
                   normsCriteria: d.settings.normsCriteria,
+                  quarterTitle: d.settings.quarterTitle,
+                  quarterCriteria: d.settings.quarterCriteria,
+                  quarterMonths: d.settings.quarterMonths,
+                  auxiliary: d.settings.auxiliary,
                 };
                 fitGrades(d.classes, base.columns.length);
               });

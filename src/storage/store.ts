@@ -3,6 +3,7 @@ import { parseMonthKey, weekdaysOf } from '../domain/attendance';
 import {
   fitGrades,
   defaultNormsCriteria,
+  defaultQuarterCriteria,
   NORMS_GRADES,
   defaultSettings,
   isWorkshop,
@@ -14,6 +15,8 @@ import {
   type AttendanceRecord,
   type Gender,
   type NormsCriterion,
+  type QuarterCriterion,
+  type QuarterRecord,
   type SchoolClass,
   type Settings,
   type Student,
@@ -94,6 +97,13 @@ function cleanNorms(raw: unknown, months: AttendanceMonth[], criteriaCount: numb
   return clean;
 }
 
+/** Valid "YYYY-MM" keys, without repeats, oldest first. */
+function cleanMonthKeys(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  const keys = raw.filter((m): m is string => typeof m === 'string' && parseMonthKey(m) !== null);
+  return [...new Set(keys)].sort();
+}
+
 /** Three criteria with a name and one paragraph per grade; anything missing or malformed falls back to the default. */
 function cleanCriteria(raw: unknown): NormsCriterion[] {
   const defaults = defaultNormsCriteria();
@@ -110,12 +120,40 @@ function cleanCriteria(raw: unknown): NormsCriterion[] {
   });
 }
 
-/** Validates and normalizes data read from disk or from a backup (version 1 to 5; always returns version 5). Returns null if invalid. */
+/** Quarter rows with a name and a valid norms criterion; anything missing or malformed falls back to the default. */
+function cleanQuarterCriteria(raw: unknown, normsCount: number): QuarterCriterion[] {
+  const list: unknown[] = Array.isArray(raw) ? raw : [];
+  return defaultQuarterCriteria().map((d, i) => {
+    const q = list[i] as Partial<QuarterCriterion> | undefined;
+    const source = q?.source;
+    return {
+      name: typeof q?.name === 'string' && q.name.trim() !== '' ? q.name : d.name,
+      source:
+        typeof source === 'number' && Number.isInteger(source) && source >= 0 && source < normsCount
+          ? source
+          : d.source,
+    };
+  });
+}
+
+/** One grade (or '') and one observation per quarter row. */
+function cleanQuarter(raw: unknown, rows: number): QuarterRecord {
+  const q = (raw && typeof raw === 'object' ? raw : {}) as Partial<QuarterRecord>;
+  const list = (x: unknown, ok: (v: unknown) => boolean): string[] =>
+    Array.from({ length: rows }, (_, i) => (Array.isArray(x) && ok(x[i]) ? (x[i] as string) : ''));
+  return {
+    grades: list(q.grades, (v) => NORMS_GRADES.includes(v as string)),
+    notes: list(q.notes, (v) => typeof v === 'string'),
+  };
+}
+
+/** Validates and normalizes data read from disk or from a backup (version 1 to 6; always returns version 6). Returns null if invalid. */
 export function validateData(x: unknown): AppData | null {
   if (!x || typeof x !== 'object') return null;
   const d = x as Partial<Omit<AppData, 'version'>> & { version?: number };
   if (
-    (d.version !== 1 && d.version !== 2 && d.version !== 3 && d.version !== 4 && d.version !== 5) ||
+    typeof d.version !== 'number' ||
+    ![1, 2, 3, 4, 5, 6].includes(d.version) ||
     !d.settings ||
     !Array.isArray(d.classes)
   )
@@ -128,7 +166,7 @@ export function validateData(x: unknown): AppData | null {
     for (const a of c.students) if (typeof a?.name !== 'string' || !Array.isArray(a.grades)) return null;
   }
   const clean = x as AppData;
-  clean.version = 5;
+  clean.version = 6;
   clean.settings.uniformNote = typeof clean.settings.uniformNote === 'string' ? clean.settings.uniformNote : '';
   const defaults = defaultSettings();
   clean.settings.normsTitle =
@@ -136,6 +174,17 @@ export function validateData(x: unknown): AppData | null {
       ? clean.settings.normsTitle
       : defaults.normsTitle;
   clean.settings.normsCriteria = cleanCriteria(clean.settings.normsCriteria);
+  clean.settings.quarterTitle =
+    typeof clean.settings.quarterTitle === 'string' && clean.settings.quarterTitle.trim() !== ''
+      ? clean.settings.quarterTitle
+      : defaults.quarterTitle;
+  clean.settings.quarterCriteria = cleanQuarterCriteria(
+    clean.settings.quarterCriteria,
+    clean.settings.normsCriteria.length,
+  );
+  clean.settings.quarterMonths = cleanMonthKeys(clean.settings.quarterMonths);
+  clean.settings.auxiliary = typeof clean.settings.auxiliary === 'string' ? clean.settings.auxiliary : '';
+  const quarterRows = clean.settings.quarterCriteria.length;
   for (const c of clean.classes) {
     c.tutor = parseTutor(typeof c.tutor === 'string' ? c.tutor : '');
     c.attendanceMonths = cleanMonths(c.attendanceMonths);
@@ -145,6 +194,7 @@ export function validateData(x: unknown): AppData | null {
       a.workshop = isWorkshop(a.workshop) ? a.workshop : '';
       a.attendance = cleanAttendance(a.attendance, c.attendanceMonths);
       a.norms = cleanNorms(a.norms, c.attendanceMonths, clean.settings.normsCriteria.length);
+      a.quarter = cleanQuarter(a.quarter, quarterRows);
     }
   }
   fitGrades(clean.classes, clean.settings.columns.length);
@@ -271,7 +321,13 @@ export interface SchoolPack {
 
 export function createSchoolPack(): string {
   return JSON.stringify(
-    { kind: SCHOOL_PACK_KIND, version: data.version, settings: data.settings, logos: customLogos() },
+    {
+      kind: SCHOOL_PACK_KIND,
+      version: data.version,
+      // Her own name and her current quarter are not part of the school's identity
+      settings: { ...data.settings, auxiliary: '', quarterMonths: [] },
+      logos: customLogos(),
+    },
     null,
     1,
   );
@@ -293,7 +349,7 @@ export function readSchoolPack(text: string): SchoolPack | null {
 /** Replaces the report settings and logos, keeping every class (grades are fitted to the pack's columns). */
 export async function applySchoolPack(pack: SchoolPack): Promise<void> {
   change((d) => {
-    d.settings = pack.settings;
+    d.settings = { ...pack.settings, auxiliary: d.settings.auxiliary, quarterMonths: d.settings.quarterMonths };
     fitGrades(d.classes, d.settings.columns.length);
   });
   await setLogos(pack.logos);

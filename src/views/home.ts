@@ -4,6 +4,7 @@ import { createBackup, backupWouldBeEmpty, readBackup, getData, restoreBackup, s
 import { progress } from '../domain/model';
 import { onLogosChange } from '../storage/logos';
 import { baseFileName } from '../domain/report-layout';
+import { buildQuarterSheet } from '../domain/quarter-layout';
 import { monthName } from '../domain/attendance';
 import { includedClasses, goTo, type View } from './view';
 import { savingBanner } from './saving-banner';
@@ -125,6 +126,14 @@ export function homeView(): View {
           hasClasses ? T.blankAttendanceHelp : `${T.blankAttendanceHelp} ${T.optionNeedsClass}`,
         ),
         optionRow(
+          h(
+            'button',
+            { class: 'btn', type: 'button', disabled: !hasClasses, onclick: () => void printBlankQuarter() },
+            T.printBlankQuarter,
+          ),
+          hasClasses ? T.blankQuarterHelp : `${T.blankQuarterHelp} ${T.optionNeedsClass}`,
+        ),
+        optionRow(
           h('button', { class: 'btn', type: 'button', onclick: () => goTo('#/settings') }, T.settings),
           T.optionSettingsHelp,
         ),
@@ -157,6 +166,17 @@ export function homeView(): View {
     const withMonth = selected.map((c) => ({ ...c, attendanceMonths: [{ month: chosen.month, days: chosen.days }] }));
     const pdf = buildAttendancePdf(withMonth, chosen.month, getData().settings, true);
     download(pdf, `${baseFileName(T.blankAttendancePrefix, selected, monthName(chosen.month))}.pdf`, MIME_PDF);
+    notice(T.downloadReady, 'ok');
+  }
+
+  /** Blank quarter strips: name, class and auxiliary filled in, no grade circled and no observations. */
+  async function printBlankQuarter(): Promise<void> {
+    const { classes, settings } = getData();
+    const selected = includedClasses(classes);
+    if (selected.length === 0) return notice(T.chooseClassesFirst, 'error');
+    const { buildQuarterPdf } = await import('../export/build-pdf');
+    const sheets = selected.flatMap((c) => c.students.map((s) => buildQuarterSheet(c, s, settings, true)));
+    download(buildQuarterPdf(sheets), `${baseFileName(T.blankQuarterPrefix, selected, settings.term)}.pdf`, MIME_PDF);
     notice(T.downloadReady, 'ok');
   }
 

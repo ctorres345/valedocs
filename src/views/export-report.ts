@@ -157,7 +157,7 @@ export function monthsOf(classes: SchoolClass[]): string[] {
   return [...new Set(classes.flatMap((c) => c.attendanceMonths.map((m) => m.month)))].sort();
 }
 
-export function exportView(kind: Exclude<ReportKind, 'norms'> = 'conduct', startMonth?: string): View {
+export function exportView(kind: Exclude<ReportKind, 'norms' | 'quarter'> = 'conduct', startMonth?: string): View {
   const root = h('div', { class: 'screen' });
   let busy = false;
   let previewClass: string | null = null;

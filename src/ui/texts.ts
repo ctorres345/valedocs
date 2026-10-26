@@ -490,6 +490,59 @@ export const T = {
     'Una sola hoja con las clases una debajo de otra, como tu archivo. Al imprimir, cada clase sale en su página.',
   layoutPerClassHelp: 'Cada clase en su propia hoja (pestaña) del Excel. El PDF siempre trae una página por clase.',
 
+  // Quarter norms report
+  quarterReport: 'Reporte trimestral de normas',
+  quarterReportHelp:
+    'Una tira por alumno con la nota del trimestre en cada criterio. La app la sugiere con las notas del reporte mensual de normas.',
+  step2Quarter: 'Revisa las notas del trimestre',
+  step2QuarterHelp:
+    'Marca los meses del trimestre. Luego abre cada clase: la nota ya viene sugerida y puedes cambiarla o escribir una observación.',
+  backToQuarter: '← Volver al reporte trimestral',
+  quarterMonths: 'Meses de este trimestre',
+  quarterMonthsHelp:
+    'Marca los meses que entran. Las notas sugeridas salen del reporte mensual de normas de esos meses.',
+  quarterNoMonths: 'Todavía no hay meses. Ábrelos en el reporte mensual de normas o en la asistencia.',
+  quarterChooseMonths: 'Marca los meses del trimestre para ver las notas sugeridas.',
+  quarterMonthsList: (months: string) => `Meses del trimestre: ${months}.`,
+  quarterChange: 'Cambiar',
+  quarterNew: 'Empezar un trimestre nuevo',
+  quarterNewTitle: 'Empezar un trimestre nuevo',
+  quarterNewText:
+    'Se quitan los meses marcados y se borran las notas que cambiaste a mano y las observaciones de todas las clases. Descarga antes el reporte de este trimestre. Las notas del reporte mensual no se tocan.',
+  quarterNewAccept: 'Sí, empezar de nuevo',
+  quarterNewDone: 'Listo. Marca los meses del nuevo trimestre.',
+  quarterEntryHelp:
+    'La nota de cada criterio ya viene sugerida con el promedio de las notas diarias. Si quieres otra, toca la letra.',
+  studentOf: (n: number, total: number) => `Alumno ${n} de ${total}`,
+  nextStudentButton: (name: string) => `Siguiente alumno: ${name} →`,
+  quarterCounts: (counts: string) => `En esos meses: ${counts}.`,
+  quarterNoDailyGrades: 'No tiene notas diarias en esos meses. Elige la letra tú.',
+  quarterSuggested: 'sugerida',
+  quarterByHand: 'elegida por ti',
+  quarterWas: (grade: string) => `La sugerida era ${grade}; toca tu letra otra vez para volver a ella.`,
+  quarterNoteLabel: 'Observaciones (opcional)',
+  quarterNotePlaceholder: 'Ejemplo: 3 tardanzas sin justificar',
+  quarterSpecialNote: (note: string) => `Este alumno tiene una nota especial: ${note}.`,
+  quarterAttendanceNote: 'en la asistencia',
+  quarterExportTitle: 'Revisa y descarga el reporte trimestral',
+  quarterPdfHelp: 'Sale un PDF con 3 alumnos por hoja A4 y una línea para cortar entre cada uno.',
+  quarterNoAuxiliary: 'Falta tu nombre para la casilla «Auxiliar». Escríbelo en',
+  quarterSkipped: (n: number) =>
+    n === 1 ? '1 alumno sin ninguna nota (no sale)' : `${n} alumnos sin ninguna nota (no salen)`,
+  quarterPartial: (n: number) => (n === 1 ? '1 alumno con criterios sin nota' : `${n} alumnos con criterios sin nota`),
+  quarterComplete: (label: string) => `Completar ${label}`,
+  quarterAllComplete: 'Todos los alumnos tienen nota en los tres criterios.',
+  quarterNothingToExport: 'Todavía no hay ninguna nota del trimestre en las clases elegidas.',
+  quarterPrefix: 'Normas trimestre',
+  printBlankQuarter: 'Imprimir tiras del trimestre en blanco',
+  blankQuarterHelp: 'Una tira por alumno con su nombre, sin notas ni observaciones, para llenarla a mano.',
+  blankQuarterPrefix: 'Tiras en blanco',
+  quarterSettingsTitle: 'Reporte trimestral de normas',
+  quarterSettingsHelp: 'Tu nombre sale en la casilla «Auxiliar» de cada tira.',
+  auxiliaryLabel: 'Tu nombre (Auxiliar)',
+  auxiliaryPlaceholder: 'Ejemplo: Ana Torres',
+  quarterRowLabel: (n: number) => `Criterio ${n}`,
+
   // General errors
   generalError: 'Algo salió mal. Inténtalo de nuevo.',
   cannotSave:

@@ -14,6 +14,7 @@ import { change, mergeStudents, getData, removeClassById, subscribe } from '../s
 import { formatTutor, parseTutor, sameClass, newStudent, newClass, progress, type SchoolClass } from '../domain/model';
 import { isClassAttendanceComplete } from '../domain/attendance';
 import { isClassNormsComplete } from '../domain/norms';
+import { QUARTER_EXPORT, quarterEntryRoute, quarterMonthsBlock, quarterProgress } from './quarter';
 import { duplicateNames } from '../domain/validation';
 import { readList, errorMessage } from '../import/worker-client';
 import type { ImportedClass } from '../import/read-names';
@@ -193,6 +194,10 @@ interface ReportSpec {
   warning: (classes: SchoolClass[]) => HTMLElement | null;
   /** Another download offered in step 3, built from the same data. */
   extra?: { label: string; help: string; route: string };
+  /** Shown in step 2 above the class cards (e.g. the months of the quarter). */
+  intro?: () => HTMLElement;
+  /** The report does not print the tutor, so the card does not ask for it. */
+  noTutor?: boolean;
 }
 
 const monthsSummary = (c: SchoolClass): HTMLElement[] => [
@@ -237,6 +242,22 @@ const REPORTS: Record<ReportKind, ReportSpec> = {
     summary: monthsSummary,
     warning: (classes) => monthsWarning('norms', classes),
   },
+  quarter: {
+    title: T.quarterReport,
+    step2: T.step2Quarter,
+    step2Help: T.step2QuarterHelp,
+    entryRoute: quarterEntryRoute,
+    entryHelp: T.quarterReportHelp,
+    exportRoute: QUARTER_EXPORT,
+    isComplete: (c) => getData().settings.quarterMonths.length > 0 && quarterProgress(c).done === c.students.length,
+    summary: (c) => {
+      const { done, total } = quarterProgress(c);
+      return [progressBar(done, total), h('p', { class: 'muted' }, T.completed(done, total))];
+    },
+    warning: () => null,
+    intro: quarterMonthsBlock,
+    noTutor: true,
+  },
 };
 
 /** One class in step 2 of a report: tutor, progress and the button that opens its entry screen. */
@@ -246,7 +267,7 @@ function reportCard(c: SchoolClass, spec: ReportSpec, onChange: () => void): HTM
     { class: 'card' },
     h('h3', {}, c.label),
     spec.summary(c),
-    tutorBox(c, onChange),
+    spec.noTutor ? null : tutorBox(c, onChange),
     optionRow(
       h('button', { class: 'btn btn-primary', type: 'button', onclick: () => goTo(spec.entryRoute(c.id)) }, spec.title),
       spec.entryHelp,
@@ -322,7 +343,7 @@ export function registerView(): View {
       h(
         'div',
         { class: 'report-choice' },
-        (['conduct', 'attendance', 'norms'] as const).map((kind) =>
+        (['conduct', 'attendance', 'norms', 'quarter'] as const).map((kind) =>
           optionRow(
             h(
               'button',
@@ -354,6 +375,7 @@ export function reportView(kind: ReportKind): View {
   };
 
   const render = (): void => {
+    const scroll = window.scrollY;
     clearChildren(root);
     const { classes } = getData();
     const allComplete = classes.length > 0 && classes.every(spec.isComplete);
@@ -382,6 +404,7 @@ export function reportView(kind: ReportKind): View {
           spec.step2,
           spec.step2Help,
           allComplete,
+          spec.intro ? spec.intro() : null,
           h(
             'div',
             { class: 'cards' },
@@ -412,6 +435,7 @@ export function reportView(kind: ReportKind): View {
         ),
       ),
     );
+    window.scrollTo(0, scroll);
   };
 
   render();

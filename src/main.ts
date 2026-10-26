@@ -11,6 +11,8 @@ import { attendanceView } from './views/attendance';
 import { monthsView } from './views/months';
 import { normsView } from './views/norms';
 import { normsExportView } from './views/norms-export';
+import { quarterView } from './views/quarter';
+import { quarterExportView } from './views/quarter-export';
 import { consolidatedView } from './views/consolidated';
 import { classDetailsView } from './views/class-details';
 import { exportView } from './views/export-report';
@@ -27,6 +29,7 @@ function pick(route: string): View {
     if (parts[2] === 'details') return classDetailsView(parts[1]);
     if (parts[2] === 'attendance')
       return parts[3] ? attendanceView(parts[1], parts[3]) : monthsView(parts[1], 'attendance');
+    if (parts[2] === 'quarter') return quarterView(parts[1]);
     if (parts[2] === 'norms') return parts[3] ? normsView(parts[1], parts[3]) : monthsView(parts[1], 'norms');
     return gradesView(parts[1]);
   }
@@ -34,8 +37,10 @@ function pick(route: string): View {
   if (parts[0] === 'conduct') return reportView('conduct');
   if (parts[0] === 'attendance') return reportView('attendance');
   if (parts[0] === 'norms') return reportView('norms');
+  if (parts[0] === 'quarter') return reportView('quarter');
   if (parts[0] === 'new') return newClassView();
   if (parts[0] === 'export' && parts[1] === 'consolidated') return consolidatedView();
+  if (parts[0] === 'export' && parts[1] === 'quarter') return quarterExportView(parts[2]);
   if (parts[0] === 'export' && parts[1] === 'norms') return normsExportView(parts[2], parts[3]);
   if (parts[0] === 'export') return exportView(parts[1] === 'attendance' ? 'attendance' : 'conduct', parts[2]);
   if (parts[0] === 'settings') return settingsView();

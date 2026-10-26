@@ -45,16 +45,16 @@ table is at the top of that script.
 
 ## Folders
 
-| Folder        | What lives there                                                                                                                                                                                                                                                   |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `src/domain`  | `model.ts` (types, defaults, ids, name/label helpers), `attendance.ts` (months, marks, summaries, pending work), `norms.ts`, `validation.ts` (`ClassProblem` codes), `text.ts`, and one `*-layout.ts` per report (conduct, attendance, consolidated, norms).       |
-| `src/storage` | `store.ts`: the single `AppData` in memory, `change()` (notify + debounced autosave), `validateData` (upgrades v1–v5, cleans every field), backup and school pack files. `logos.ts`: the two logos, custom ones in IndexedDB, bundled defaults optional.           |
-| `src/import`  | `read-names.ts` (names, gender and workshop columns from an .xlsx, drawings skipped), `clean.ts` (strips invisible shapes), `worker.ts` + `worker-client.ts` (both run off the main thread; errors become Spanish messages in the client).                         |
-| `src/export`  | `build-xlsx.ts`, `build-pdf.ts`, `build-docx.ts` (OOXML zipped with fflate, no Word library), `norms-files.ts` (one file or a zip per student), `drive.ts` (Google Identity Services, `drive.file` scope).                                                         |
-| `src/ui`      | `dom.ts` (`h()`, notices, dialogs, file pickers, tabs), `texts.ts`, `steps.ts`, `styles.css`, the bundled font.                                                                                                                                                    |
-| `src/views`   | One file per screen, each exporting `xxxView(): View` (`{ el, destroy? }`). Shared pieces: `grid-keys.ts` (entry mode, undo stack, keyboard grid), `month-kind.ts` and `months-warning.ts` (what attendance and norms share), `saving-banner.ts`, `start-over.ts`. |
-| `tests`       | Vitest. `fixtures.ts` builds synthetic teacher workbooks with invented names.                                                                                                                                                                                      |
-| `scripts`     | `embed-logos.mjs` (optional bundled logos), `check-layers.mjs`.                                                                                                                                                                                                    |
+| Folder        | What lives there                                                                                                                                                                                                                                                                    |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/domain`  | `model.ts` (types, defaults, ids, name/label helpers), `attendance.ts` (months, marks, summaries, pending work), `norms.ts`, `quarter.ts`, `validation.ts` (`ClassProblem` codes), `text.ts`, and one `*-layout.ts` per report (conduct, attendance, consolidated, norms, quarter). |
+| `src/storage` | `store.ts`: the single `AppData` in memory, `change()` (notify + debounced autosave), `validateData` (upgrades v1–v5, cleans every field), backup and school pack files. `logos.ts`: the two logos, custom ones in IndexedDB, bundled defaults optional.                            |
+| `src/import`  | `read-names.ts` (names, gender and workshop columns from an .xlsx, drawings skipped), `clean.ts` (strips invisible shapes), `worker.ts` + `worker-client.ts` (both run off the main thread; errors become Spanish messages in the client).                                          |
+| `src/export`  | `build-xlsx.ts`, `build-pdf.ts`, `build-docx.ts` (OOXML zipped with fflate, no Word library), `norms-files.ts` (one file or a zip per student), `drive.ts` (Google Identity Services, `drive.file` scope).                                                                          |
+| `src/ui`      | `dom.ts` (`h()`, notices, dialogs, file pickers, tabs), `texts.ts`, `steps.ts`, `styles.css`, the bundled font.                                                                                                                                                                     |
+| `src/views`   | One file per screen, each exporting `xxxView(): View` (`{ el, destroy? }`). Shared pieces: `grid-keys.ts` (entry mode, undo stack, keyboard grid), `month-kind.ts` and `months-warning.ts` (what attendance and norms share), `saving-banner.ts`, `start-over.ts`.                  |
+| `tests`       | Vitest. `fixtures.ts` builds synthetic teacher workbooks with invented names.                                                                                                                                                                                                       |
+| `scripts`     | `embed-logos.mjs` (optional bundled logos), `check-layers.mjs`.                                                                                                                                                                                                                     |
 
 ## Data
 
@@ -68,20 +68,22 @@ under `valedocs:*` keys.
   (`setMonthDays`, `deleteMonth`) keeps both reports' data in step.
 - A **student** has conduct `grades` (one per settings column), `attendance[month]` (one mark per school day),
   `norms[month]` (criteria × days), an optional special `note` that replaces the grades (a transfer, for
-  example), a gender (`H`/`M`/`''`) and a workshop code.
+  example), a gender (`H`/`M`/`''`), a workshop code and `quarter` (the quarter norms grades she chose by hand
+  and her observations; an empty grade means the suggestion computed from `norms` is printed).
 - **Settings** hold the header texts, the column headers, the allowed grades, the attendance uniform note, and the
-  norms title and paragraphs. Together with the logos they form a **school pack**, a JSON file a school can carry
+  norms title and paragraphs, and the quarter report's title, rows, months and auxiliary name (the last two are
+  hers, so a school pack leaves them out and loading one keeps them). Together with the logos they form a **school pack**, a JSON file a school can carry
   to another device; a **backup** is the same plus the classes.
 
-`validateData` is the only door for data coming from disk or a file: it accepts versions 1 to 5, fills every
-missing field, drops malformed months and marks, and returns version 5. When stored data cannot be read (saved
+`validateData` is the only door for data coming from disk or a file: it accepts versions 1 to 6, fills every
+missing field, drops malformed months and marks, and returns version 6. When stored data cannot be read (saved
 by a newer version, or the browser refused), the store **locks**: nothing is saved, every editable screen shows
 a warning, and a backup download is refused because it would be empty.
 
 ## Screens and navigation
 
 `#/` is a menu. `#/steps` is the classes screen (import, class cards, pick a report). Each report has a 3-step
-guide (`#/conduct`, `#/attendance`, `#/norms`; `reportView(kind)` in `views/register.ts`, driven by the `REPORTS`
+guide (`#/conduct`, `#/attendance`, `#/norms`, `#/quarter`; `reportView(kind)` in `views/register.ts`, driven by the `REPORTS`
 table) whose steps are: classes (done), class cards with the tutor name and the entry button, preview and
 download. Entry screens (`grades.ts`, `attendance.ts`, `norms.ts`) share the same shape: a keyboard grid on
 desktop, one column or day at a time with big buttons on phones, undo, "fill empty with A", and a footer that

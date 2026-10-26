@@ -27,7 +27,7 @@ function example(): AppData {
   const b = newStudent('LUNA DIAZ, ROSA', n);
   b.note = 'TRASLADO';
   return {
-    version: 5,
+    version: 6,
     settings: defaultSettings(),
     classes: [
       {
@@ -61,7 +61,7 @@ describe('backup', () => {
     delete v1.classes[0].attendanceMonths;
     for (const s of v1.classes[0].students) delete s.attendance;
     const up = readBackup(JSON.stringify(v1))?.data;
-    expect(up?.version).toBe(5);
+    expect(up?.version).toBe(6);
     expect(up?.settings.uniformNote).toBe('');
     expect(up?.classes[0].attendanceMonths).toEqual([]);
     expect(up?.classes[0].students[0].grades).toEqual(['A', 'AD', 'B']);
@@ -200,7 +200,7 @@ describe('norms data (version 3)', () => {
     delete v2.settings.normsCriteria;
     for (const s of v2.classes[0].students) delete s.norms;
     const up = readBackup(JSON.stringify(v2))!.data;
-    expect(up.version).toBe(5);
+    expect(up.version).toBe(6);
     expect(up.settings.normsCriteria).toEqual(defaultSettings().normsCriteria);
     expect(up.settings.normsTitle).toBe(defaultSettings().normsTitle);
     expect(up.classes[0].students[0].norms).toEqual({});
@@ -303,7 +303,7 @@ describe('student gender (version 4) and workshop (version 5)', () => {
     d.classes[0].students[2].gender = 'M';
     for (const c of d.settings.normsCriteria) delete c.textsFemale;
     const up = validateData(d)!;
-    expect(up.version).toBe(5);
+    expect(up.version).toBe(6);
     expect(up.classes[0].students.map((s) => s.gender)).toEqual(['', '', 'M']);
     expect(up.settings.normsCriteria[0].textsFemale).toEqual(defaultSettings().normsCriteria[0].textsFemale);
   });
@@ -407,9 +407,14 @@ describe('school pack', () => {
     await setLogos({ left: logo, right: null });
     const data = example();
     data.settings.institution2 = 'COLEGIO DE PRUEBA';
+    data.settings.auxiliary = 'Nombre Inventado';
+    data.settings.quarterMonths = ['2026-06'];
     store.replaceAll(data);
     const text = store.createSchoolPack();
     expect(text).not.toContain('PEREZ RUIZ');
+    // Her own name and her quarter stay on her device
+    expect(text).not.toContain('Nombre Inventado');
+    expect(text).not.toContain('2026-06');
     const pack = store.readSchoolPack(text)!;
     expect(pack.settings.institution2).toBe('COLEGIO DE PRUEBA');
     expect(pack.logos).toEqual({ left: logo, right: null });
@@ -418,9 +423,13 @@ describe('school pack', () => {
     await setLogos({ left: null, right: null });
     const other = example();
     other.settings.institution2 = 'OTRO';
+    other.settings.auxiliary = 'Otra Persona';
+    other.settings.quarterMonths = ['2026-09'];
     store.replaceAll(other);
     await store.applySchoolPack(pack);
     expect(store.getData().settings.institution2).toBe('COLEGIO DE PRUEBA');
+    expect(store.getData().settings.auxiliary).toBe('Otra Persona');
+    expect(store.getData().settings.quarterMonths).toEqual(['2026-09']);
     expect(store.getData().classes).toHaveLength(1);
     expect(customLogos()).toEqual({ left: logo, right: null });
   });

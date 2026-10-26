@@ -22,6 +22,7 @@ import {
   type ConsolidatedReport,
 } from '../domain/consolidated-layout';
 import { CRITERIA_HEADER, HOLIDAY_LABEL, NORMS_HEADER_LABELS, type NormsReport } from '../domain/norms-layout';
+import { QUARTER_LABELS, QUARTER_PER_PAGE, type QuarterSheet } from '../domain/quarter-layout';
 import { imageFormat, getLogos } from '../storage/logos';
 
 const MARGIN = 12;
@@ -441,6 +442,140 @@ export function buildNormsPdf(reports: NormsReport[]): Uint8Array {
       });
       y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 4;
     }
+  });
+  return new Uint8Array(doc.output('arraybuffer'));
+}
+
+/** Height of one strip of the quarter norms report: the A4 page is cut in three. */
+const STRIP_HEIGHT = PAGE_HEIGHT / QUARTER_PER_PAGE;
+
+/** Observaciones that fit their cell: smaller letters for a long text, and cut with "…" if it is still too long. */
+function fitNote(doc: jsPDF, text: string, width: number): { lines: string[]; size: number } {
+  for (const [size, max] of [
+    [8, 2],
+    [6.5, 3],
+  ] as const) {
+    doc.setFontSize(size);
+    const lines = doc.splitTextToSize(text, width) as string[];
+    if (lines.length <= max) return { lines, size };
+  }
+  const lines = (doc.splitTextToSize(text, width) as string[]).slice(0, 3);
+  lines[2] = `${lines[2].replace(/\s*\S*$/, '')}…`;
+  return { lines, size: 6.5 };
+}
+
+/** A black header cell with white bold text, like the paper form. */
+function darkCell(doc: jsPDF, x: number, y: number, w: number, h: number, text: string, center = false): void {
+  doc.setFillColor(0, 0, 0);
+  doc.rect(x, y, w, h, 'FD');
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.text(text, center ? x + w / 2 : x + 2, y + h / 2, { baseline: 'middle', align: center ? 'center' : 'left' });
+  doc.setTextColor(0, 0, 0);
+}
+
+function drawQuarterStrip(doc: jsPDF, r: QuarterSheet, top: number): void {
+  const L = QUARTER_LABELS;
+  const left = MARGIN + 2;
+  const width = PAGE_WIDTH - left * 2;
+  const center = PAGE_WIDTH / 2;
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.25);
+
+  // Header: logo and school name on the left, term and title centred below
+  const { left: logo } = getLogos();
+  let textX = left;
+  if (logo) {
+    const height = 11;
+    const w = (height * logo.width) / logo.height;
+    doc.addImage(logo.uri, imageFormat(logo.uri) === 'png' ? 'PNG' : 'JPEG', left, top + 5, w, height, 'logo-left');
+    textX = left + w + 3;
+  }
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.text(
+    [r.institution1, r.institution2].filter((t) => t.trim() !== ''),
+    textX,
+    top + 9,
+  );
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10.5);
+  doc.text(r.term, center, top + 20, { align: 'center' });
+  doc.setFontSize(9.5);
+  doc.text(r.title, center, top + 25, { align: 'center', maxWidth: width });
+
+  // Student box
+  let y = top + 29;
+  const rowH = 7;
+  const labelW = 38;
+  darkCell(doc, left, y, labelW, rowH, L.name);
+  doc.rect(left + labelW, y, width - labelW, rowH);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9.5);
+  doc.text(r.name, left + labelW + 2, y + rowH / 2, { baseline: 'middle', maxWidth: width - labelW - 4 });
+  y += rowH;
+  const courseW = 52;
+  const auxLabelW = 22;
+  darkCell(doc, left, y, labelW, rowH, L.course);
+  doc.rect(left + labelW, y, courseW, rowH);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text(r.course, left + labelW + 2, y + rowH / 2, { baseline: 'middle', maxWidth: courseW - 4 });
+  darkCell(doc, left + labelW + courseW, y, auxLabelW, rowH, L.auxiliary);
+  const auxX = left + labelW + courseW + auxLabelW;
+  doc.rect(auxX, y, width - (auxX - left), rowH);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text(r.auxiliary, auxX + 2, y + rowH / 2, { baseline: 'middle', maxWidth: width - (auxX - left) - 4 });
+
+  // Criteria table
+  y += rowH + 4;
+  const cols = [10, 62, 46, width - 10 - 62 - 46];
+  const xs = cols.reduce<number[]>((acc, w, i) => [...acc, (acc[i] ?? left) + w], [left]);
+  [L.number, L.criteria, L.level, L.notes].forEach((t, i) => darkCell(doc, xs[i], y, cols[i], rowH, t, i !== 1));
+  y += rowH;
+  const lineH = 10;
+  r.rows.forEach((row, i) => {
+    cols.forEach((w, k) => doc.rect(xs[k], y, w, lineH));
+    const mid = y + lineH / 2;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9.5);
+    doc.text(String(i + 1), xs[0] + cols[0] / 2, mid, { baseline: 'middle', align: 'center' });
+    doc.text(row.criterion, xs[1] + 2, mid, { baseline: 'middle', maxWidth: cols[1] - 4 });
+    // Every level is printed and the chosen one is circled
+    const step = cols[2] / r.levels.length;
+    r.levels.forEach((level, k) => {
+      const cx = xs[2] + step * (k + 0.5);
+      doc.setFont('helvetica', level === row.grade ? 'bold' : 'normal');
+      doc.text(level, cx, mid, { baseline: 'middle', align: 'center' });
+      if (level === row.grade) doc.ellipse(cx, mid, level.length > 1 ? 4.6 : 3.4, 3.4);
+    });
+    if (row.note !== '') {
+      doc.setFont('helvetica', 'normal');
+      const { lines, size } = fitNote(doc, row.note, cols[3] - 4);
+      doc.setFontSize(size);
+      const lh = size * 0.42;
+      doc.text(lines, xs[3] + 2, mid - ((lines.length - 1) * lh) / 2, { baseline: 'middle' });
+    }
+    y += lineH;
+  });
+}
+
+/** Quarter norms report: one strip per student, three per A4 page, with dashed lines to cut them apart. */
+export function buildQuarterPdf(sheets: QuarterSheet[]): Uint8Array {
+  const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
+  sheets.forEach((r, i) => {
+    const slot = i % QUARTER_PER_PAGE;
+    if (i > 0 && slot === 0) doc.addPage();
+    if (slot > 0) {
+      doc.setLineDashPattern([2, 2], 0);
+      doc.setDrawColor(150, 150, 150);
+      doc.setLineWidth(0.2);
+      doc.line(4, slot * STRIP_HEIGHT, PAGE_WIDTH - 4, slot * STRIP_HEIGHT);
+      doc.setLineDashPattern([], 0);
+    }
+    drawQuarterStrip(doc, r, slot * STRIP_HEIGHT + 3);
   });
   return new Uint8Array(doc.output('arraybuffer'));
 }

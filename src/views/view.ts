@@ -1,7 +1,7 @@
 import type { SchoolClass } from '../domain/model';
 
 /** The reports the app makes. */
-export type ReportKind = 'conduct' | 'attendance' | 'norms';
+export type ReportKind = 'conduct' | 'attendance' | 'norms' | 'quarter';
 
 /** A screen: its root element and, if needed, how to clean up when leaving. */
 export interface View {

@@ -49,6 +49,16 @@ export interface Student {
   gender: Gender;
   /** Code of the extracurricular workshop (see `WORKSHOPS`); '' = not chosen. Mandatory in the attendance report. */
   workshop: string;
+  /** Quarter norms report of the current quarter (see `Settings.quarterMonths`). */
+  quarter: QuarterRecord;
+}
+
+/** One student's quarter norms report: one entry per `Settings.quarterCriteria`, in that order. */
+export interface QuarterRecord {
+  /** Grade she chose by hand; '' = the suggestion computed from the monthly norms grades is used. */
+  grades: string[];
+  /** Observaciones she typed. */
+  notes: string[];
 }
 
 export interface SchoolClass {
@@ -76,6 +86,21 @@ export interface Settings {
   normsTitle: string;
   /** The three criteria of the norms report, in the order of the template. */
   normsCriteria: NormsCriterion[];
+  /** Title of the quarter norms report (the term is printed above it). */
+  quarterTitle: string;
+  /** Rows of the quarter norms report, in the order of its template. */
+  quarterCriteria: QuarterCriterion[];
+  /** Months of the current quarter: the suggested grades are computed from the norms grades of these months. */
+  quarterMonths: MonthKey[];
+  /** Name printed in the "Auxiliar" box of the quarter norms report (the person using the app, not the school). */
+  auxiliary: string;
+}
+
+/** One row of the quarter norms report: its printed name and the monthly norms criterion its grade comes from. */
+export interface QuarterCriterion {
+  name: string;
+  /** Index in `Settings.normsCriteria`. */
+  source: number;
 }
 
 /** One criterion of the monthly norms report: its name and the paragraph printed for each grade of `NORMS_GRADES`. */
@@ -88,7 +113,7 @@ export interface NormsCriterion {
 }
 
 export interface AppData {
-  version: 5;
+  version: 6;
   settings: Settings;
   classes: SchoolClass[];
 }
@@ -148,6 +173,22 @@ export function defaultNormsCriteria(): NormsCriterion[] {
   ];
 }
 
+/** Rows of the quarter report in the order of its paper form; `source` points into `defaultNormsCriteria()`. */
+export function defaultQuarterCriteria(): QuarterCriterion[] {
+  return [
+    { name: 'Presentación personal', source: 1 },
+    { name: 'Asistencia y puntualidad', source: 0 },
+    { name: 'Comportamiento', source: 2 },
+  ];
+}
+
+export function emptyQuarter(criteriaCount: number): QuarterRecord {
+  return {
+    grades: Array.from({ length: criteriaCount }, () => ''),
+    notes: Array.from({ length: criteriaCount }, () => ''),
+  };
+}
+
 /**
  * Settings of a fresh install. They are generic on purpose: the school's own name, titles and logos are typed in
  * "Ajustes del reporte" or loaded from a school pack, and from then on they live in the browser and in backups.
@@ -168,11 +209,15 @@ export function defaultSettings(): Settings {
     uniformNote: '',
     normsTitle: 'REPORTE MENSUAL DEL CUMPLIMIENTO DE NORMAS',
     normsCriteria: defaultNormsCriteria(),
+    quarterTitle: 'REPORTE DE NIVELES DE LOGRO EN EL CUMPLIMIENTO DE LAS NORMAS DE LA IE',
+    quarterCriteria: defaultQuarterCriteria(),
+    quarterMonths: [],
+    auxiliary: '',
   };
 }
 
 export function emptyData(): AppData {
-  return { version: 5, settings: defaultSettings(), classes: [] };
+  return { version: 6, settings: defaultSettings(), classes: [] };
 }
 
 let counter = 0;
@@ -194,6 +239,7 @@ export function newStudent(name: string, columnCount: number, gender: Gender = '
     norms: {},
     gender,
     workshop,
+    quarter: emptyQuarter(defaultQuarterCriteria().length),
   };
 }
 

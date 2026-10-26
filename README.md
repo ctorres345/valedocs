@@ -8,6 +8,7 @@
 <p align="center">
   <a href="https://github.com/ctorres345/valedocs/actions/workflows/ci.yml"><img src="https://github.com/ctorres345/valedocs/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
   <a href="https://github.com/ctorres345/valedocs/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-black" alt="Apache-2.0 licence"></a>
+  <a href="https://github.com/ctorres345/valedocs/releases"><img src="https://img.shields.io/github/v/release/ctorres345/valedocs?display_name=tag&color=2563eb" alt="Latest release"></a>
   <a href="https://ko-fi.com/pandaveloper"><img src="https://img.shields.io/badge/Ko--fi-support%20the%20project-FF5E5B?logo=ko-fi&logoColor=white" alt="Support the project on Ko-fi"></a>
 </p>
 

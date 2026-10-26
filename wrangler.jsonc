@@ -5,5 +5,7 @@
     "directory": "./dist",
   },
   // Cloudflare creates the DNS record and certificate for this domain (cjtech.dev is in the same account)
+  // Branch builds run `wrangler preview`, which needs this block (it can stay empty)
+  "previews": {},
   "routes": [{ "pattern": "valedocs.cjtech.dev", "custom_domain": true }],
 }

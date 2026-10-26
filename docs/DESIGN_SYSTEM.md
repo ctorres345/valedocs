@@ -42,6 +42,30 @@ Defined on `:root` (day) and overridden for night (`@media (prefers-color-scheme
 Type scale: body `1rem` (18 px, 22 px in large-text mode), `h1` 1.6 rem, `h2` 1.2 rem, `h3` 1.1 rem, big
 buttons 1.15 rem. Line height 1.5.
 
+## Logo and images
+
+The logo is the paw of Vale (the maintainer's dog, who gave the app its name) stamped on a report sheet: an
+ink-blue (`#1e3a5f`) rounded square, a white sheet with a light-blue folded corner (`#b9c8ee`), and an ink paw.
+`public/favicon.svg` is the source; every other image is drawn from it. In the top bar the square is left out
+(the bar is already ink blue) and the paw takes `--bar-bg`, so it follows night mode.
+
+| File                                  | Size        | Used for                                                            |
+| ------------------------------------- | ----------- | ------------------------------------------------------------------- |
+| `public/favicon.svg`                  | vector      | Browser tab, manifest                                               |
+| `public/favicon-32.png`               | 32 x 32     | Tab icon for browsers without SVG favicons                          |
+| `public/apple-touch-icon.png`         | 180 x 180   | iPhone/iPad home screen (full square, iOS rounds the corners)       |
+| `public/icon-192.png`, `icon-512.png` | 192, 512    | Android home screen (`manifest.webmanifest`)                        |
+| `public/icon-maskable-512.png`        | 512 x 512   | Android adaptive icon (logo inside the central safe zone)           |
+| `public/og-image.png`                 | 1200 x 630  | Link preview when the address is shared on WhatsApp, Facebook, etc. |
+| `docs/images/readme-banner.png`       | 1280 x 400  | README header (rendered at 2x)                                      |
+| `docs/images/social-preview.png`      | 1280 x 640  | GitHub social preview (Settings > General > Social preview)         |
+| `docs/images/promo-square.png`        | 1080 x 1080 | Promo to share with teachers, in Spanish                            |
+
+The promo images use the Atkinson Hyperlegible font, the `--bg` background, a faint trail of paw prints, and the
+screenshots of `docs/screenshots/` (invented data only). The manifest uses `"display": "browser"`, so the home
+screen icon opens the normal browser, with its back button and downloads working as usual. Never put a school's
+name or logos in these images.
+
 ## Components (CSS classes)
 
 | Component          | Classes                                                                                                        | Notes                                                                                                          |

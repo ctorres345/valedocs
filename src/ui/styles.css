@@ -176,20 +176,21 @@ p {
   font-weight: 400;
   opacity: 0.85;
 }
+/* The logo without its square: the top bar already is the ink-blue background. */
 .brand-mark {
-  width: 1.6rem;
-  height: 1.6rem;
+  width: 1.4rem;
+  height: 1.95rem;
   flex: none;
 }
-.brand-mark rect {
+.brand-sheet {
   fill: var(--bar-text);
 }
-.brand-mark path {
-  fill: none;
-  stroke: var(--bar-bg);
-  stroke-width: 8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+.brand-fold {
+  fill: var(--bar-text);
+  opacity: 0.7;
+}
+.brand-paw {
+  fill: var(--bar-bg);
 }
 .brand:focus-visible {
   outline: 3px solid var(--bar-text);

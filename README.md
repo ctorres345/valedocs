@@ -1,4 +1,6 @@
-<h1 align="center">Valedocs</h1>
+<p align="center">
+  <img src="docs/images/readme-banner.png" width="760" alt="Valedocs: registro de notas para docentes. El logo es una hoja con la huella de un perro.">
+</p>
 
 <p align="center">
   <strong>Registro de notas para docentes, sin instalar nada y sin subir datos a ningún lado.</strong><br>

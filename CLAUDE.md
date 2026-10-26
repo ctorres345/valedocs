@@ -126,4 +126,5 @@ Useful agents and skills for this project:
 - Prettier (`.prettierrc`: 120 cols, single quotes, trailing commas); LF line endings (`.gitattributes`).
 - Commits: short imperative subject, bullets for details. End with the attribution line configured for the session.
 - Don't add planning/analysis documents to the repo; keep decisions in this file, the README or `docs/`.
+- Logo (Vale's paw on a sheet) and every icon/promo image: `public/favicon.svg` is the source; the list of files is in `docs/DESIGN_SYSTEM.md` ("Logo and images"). Regenerate them all after changing the logo.
 - Screenshots in `docs/screenshots/` are taken with Playwright on invented data (a seed script in the thread that made them); retake them after a visual change, never with real names.

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Valedocs logo: the paw of Vale (the maintainer's dog) stamped on a report sheet. -->
+  <rect width="100" height="100" rx="22" fill="#1e3a5f"/>
+  <path d="M27 12h36l14 14v58a4 4 0 0 1-4 4H27a4 4 0 0 1-4-4V16a4 4 0 0 1 4-4z" fill="#fff"/>
+  <path d="M63 12v10a4 4 0 0 0 4 4h10z" fill="#b9c8ee"/>
+  <g fill="#1e3a5f" transform="translate(25 37) scale(.5)">
+    <path d="M50 49c9 0 17 9 21 17 4 8 2 17-7 17-5 0-9-2-14-2s-9 2-14 2c-9 0-11-9-7-17 4-8 12-17 21-17z"/>
+    <ellipse cx="25" cy="44" rx="7.5" ry="10" transform="rotate(-28 25 44)"/>
+    <ellipse cx="39.5" cy="27" rx="8" ry="11" transform="rotate(-9 39.5 27)"/>
+    <ellipse cx="60.5" cy="27" rx="8" ry="11" transform="rotate(9 60.5 27)"/>
+    <ellipse cx="75" cy="44" rx="7.5" ry="10" transform="rotate(28 75 44)"/>
+  </g>
+</svg>

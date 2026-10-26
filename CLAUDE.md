@@ -73,7 +73,7 @@ npm run logos    # regenerate src/storage/logos-default.ts from assets/logos
 npm run build    # output in dist/
 ```
 
-Cesar's Windows machine runs Node 24; Vite 4 / Vitest 0.34 are kept so Node 16 still works (CI tests it), so scripts must not use Node 17+ APIs (`structuredClone`, etc.) and must build paths with `fileURLToPath`, never `URL.pathname` (breaks on Windows). Wrangler 4 needs Node 22, so deploys cannot be run locally (see below). Cloudflare builds with Node 22 (`.node-version`). CI (`.github/workflows/ci.yml`) runs `npm run check` and `npm run build` on Node 16 and 22.
+The maintainer's machine runs Node 24; Vite 4 / Vitest 0.34 are kept so Node 16 still works (CI tests it), so scripts must not use Node 17+ APIs (`structuredClone`, etc.) and must build paths with `fileURLToPath`, never `URL.pathname` (breaks on Windows). Wrangler 4 needs Node 22, so deploys cannot be run locally (see below). Cloudflare builds with Node 22 (`.node-version`). CI (`.github/workflows/ci.yml`) runs `npm run check` and `npm run build` on Node 16 and 22.
 
 ## Testing
 
@@ -93,7 +93,7 @@ Cesar's Windows machine runs Node 24; Vite 4 / Vitest 0.34 are kept so Node 16 s
 
 - [ ] **Google Drive export** (button is hidden until configured). Free: the Drive API has no charge for normal use, and `drive.file` is a non-sensitive scope. Steps (also in README): create a Google Cloud project, enable Drive API, configure the OAuth consent screen (External), add the user's Gmail as a **test user**, create an OAuth client ID of type "Web application" with `https://valedocs.cjtech.dev` and `http://localhost:5173` as authorised origins, then set `VITE_GOOGLE_CLIENT_ID` in Cloudflare (Variables) and `.env.local`. Expect Google's "app not verified" warning screen in testing mode: do the first sign-in with her, or do the basic verification. Then test the upload end to end.
 - [ ] Try a real teacher file on the live site with her.
-- [ ] Optional refactors still deferred (details: `~/.claude/plans/attendance_enhancements.md`): `views/export-report.ts` still branches on conduct/attendance (the guide in `views/register.ts` already uses the `REPORTS` table); de-duplicate the Excel/PDF builders. Done: mode/undo/keyboard shared in `views/grid-keys.ts`.
+- [ ] Optional refactors still deferred: `views/export-report.ts` still branches on conduct/attendance (the guide in `views/register.ts` already uses the `REPORTS` table); de-duplicate the Excel/PDF builders. Done: mode/undo/keyboard shared in `views/grid-keys.ts`.
 - [ ] Optional: `views/grades.ts` is the largest file (~375 lines); split rendering from keyboard handling if it grows.
 
 ## Claude Code usage
